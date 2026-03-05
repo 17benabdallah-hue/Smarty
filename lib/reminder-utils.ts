@@ -1,5 +1,5 @@
 import { addMinutes, addHours, addDays, setHours, setMinutes, setSeconds, isBefore, format } from 'date-fns';
-import { LanguageCode, translations } from './translations';
+import { LanguageCode, translations } from '@/lib/translations';
 
 export type Priority = 1 | 2 | 3 | 4;
 
