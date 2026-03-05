@@ -1,57 +1,77 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Settings, Shield, Bell, Moon, Sparkles, Globe } from 'lucide-react';
-import { useLanguage } from '@/lib/LanguageContext';
-import { LanguageCode } from '@/lib/translations';
+import React, { useContext } from 'react';
+import { LanguageContext } from '@/lib/LanguageContext';
+import { ErrorHandlerContext } from '@/lib/error-context';
+import { SystemManager } from '@/lib/SystemManager';
 
-interface SettingsScreenProps {
-  onBack: () => void;
-}
+export const SettingsScreen = () => {
+  const { language, setLanguage } = useContext(LanguageContext);
+  const errorHandler = useContext(ErrorHandlerContext);
 
-export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
-  const [isDark, setIsDark] = useState<boolean | null>(null);
-  const [isSmartAnalysisEnabled, setIsSmartAnalysisEnabled] = useState(true);
-  const { language, setLanguage, t, isRTL } = useLanguage();
+  const handleLanguageChange = (lang: string) => {
+    try {
+      setLanguage(lang);
+      alert(`تم تغيير اللغة إلى ${lang}`);
+    } catch (error) {
+      errorHandler?.onError(error);
+    }
+  };
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const isDarkMode = savedTheme === 'dark';
-    setIsDark(isDarkMode);
-    document.documentElement.classList.toggle('dark', isDarkMode);
+  const toggleDarkMode = () => {
+    try {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    } catch (error) {
+      errorHandler?.onError(error);
+    }
+  };
 
-    const smartAnalysis = localStorage.getItem('smart_analysis_enabled');
-    if (smartAnalysis !== null) setIsSmartAnalysisEnabled(smartAnalysis === 'true');
-  }, []);
-
-  useEffect(() => {
-    if (isDark === null) return;
-    document.documentElement.classList.toggle('dark', isDark);
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
-
-  const toggleDarkMode = () => setIsDark(prev => !prev);
-
-  const languages: { code: LanguageCode; label: string }[] = [
-    { code: 'ar', label: 'العربية' },
-    { code: 'en', label: 'English' },
-    { code: 'fr', label: 'Français' },
-    { code: 'zh', label: '中文' },
-  ];
-
-  if (isDark === null) return null;
+  const checkRegistries = async () => {
+    try {
+      const statuses = await SystemManager.checkRegistryStatus();
+      console.log('Registry statuses:', statuses);
+      alert('تم فحص حالة النظام، تحقق من الكونسول');
+    } catch (error) {
+      errorHandler?.onError(error);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-full bg-[#E65100] dark:bg-zinc-950 text-black dark:text-white transition-colors duration-500">
-      {/* App Bar */}
-      <div className="flex items-center gap-4 p-6 bg-black/10 backdrop-blur-sm sticky top-0 z-10 border-b border-white/10">
-        <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white">
-          {isRTL ? <ChevronLeft className="w-6 h-6 rotate-180" /> : <ChevronLeft className="w-6 h-6" />}
-        </button>
-        <h1 className="text-2xl font-black tracking-tight text-white">{t.settings}</h1>
+    <div className="p-4 space-y-4">
+      <h1 className="text-xl font-bold">إعدادات التطبيق</h1>
+
+      {/* اللغة */}
+      <div>
+        <h2 className="font-semibold">اللغة</h2>
+        {['ar', 'en', 'fr', 'zh'].map((langCode) => (
+          <button
+            key={langCode}
+            className={`px-2 py-1 m-1 border ${language === langCode ? 'border-blue-500' : 'border-gray-300'}`}
+            onClick={() => handleLanguageChange(langCode)}
+          >
+            {langCode.toUpperCase()}
+          </button>
+        ))}
       </div>
 
-      {/* باقي محتوى الشاشة ... */}
+      {/* الوضع الليلي */}
+      <div>
+        <h2 className="font-semibold">الوضع الليلي</h2>
+        <button className="px-2 py-1 border border-gray-300" onClick={toggleDarkMode}>
+          تبديل الوضع
+        </button>
+      </div>
+
+      {/* التحقق من الخدمات */}
+      <div>
+        <h2 className="font-semibold">فحص النظام</h2>
+        <button className="px-2 py-1 border border-gray-300" onClick={checkRegistries}>
+          تحقق من الخدمات الخارجية
+        </button>
+      </div>
+
+      {/* مزيد من الإعدادات يمكن إضافتها هنا */}
     </div>
   );
 };
