@@ -1,41 +1,39 @@
-"use client";
+'use client';
 
 import { useState } from "react";
+import AddReminder from "./pages/AddReminder";
 
 export default function Home() {
-  const [text, setText] = useState("");
+
+  const [showAdd, setShowAdd] = useState(false);
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Smarty</h1>
+    <main className="min-h-screen flex flex-col items-center justify-start p-6">
 
-      <p>اكتب تذكيرك:</p>
+      {/* عنوان التطبيق */}
+      <h1 className="text-3xl font-bold mb-6">
+        Smarty
+      </h1>
 
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="مثال: اشرب الدواء الساعة 16:00"
-        style={{
-          padding: 10,
-          width: "100%",
-          border: "1px solid #ccc",
-          borderRadius: 8,
-        }}
-      />
+      <p className="mb-8 text-center text-gray-500">
+        السكرتير الذكي الذي لا ينسى
+      </p>
 
-      <br />
-      <br />
-
+      {/* زر إضافة تذكير */}
       <button
-        style={{
-          padding: 10,
-          background: "#6750A4",
-          color: "white",
-          borderRadius: 8,
-        }}
+        onClick={() => setShowAdd(true)}
+        className="bg-purple-600 text-white px-6 py-3 rounded-xl"
       >
-        حفظ التذكير
+        إضافة تذكير
       </button>
+
+      {/* نافذة إضافة التذكير */}
+      {showAdd && (
+        <div className="mt-8 w-full max-w-md">
+          <AddReminder />
+        </div>
+      )}
+
     </main>
   );
 }
