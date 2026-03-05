@@ -1,44 +1,62 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ChevronLeft, Settings, Shield, Bell, Moon, Sparkles, Globe } from 'lucide-react';
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../lib/LanguageContext';
 import { LanguageCode } from '@/lib/translations';
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
 
-/**
- * شاشة الإعدادات - نسخة الويب المستوحاة من SettingsScreen في أندرويد
- * Settings Screen - Web version inspired by the Android implementation
- */
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
-  const [isDark, setIsDark] = React.useState(false);
-  const [isSmartAnalysisEnabled, setIsSmartAnalysisEnabled] = React.useState(true);
+  const [isDark, setIsDark] = useState(false);
+  const [isSmartAnalysisEnabled, setIsSmartAnalysisEnabled] = useState(true);
   const { language, setLanguage, t, isRTL } = useLanguage();
 
-  React.useEffect(() => {
-    setIsDark(document.documentElement.classList.contains('dark'));
+  useEffect(() => {
+    // تحميل الحالة المحفوظة من localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     const smartAnalysis = localStorage.getItem('smart_analysis_enabled');
     if (smartAnalysis !== null) {
       setIsSmartAnalysisEnabled(smartAnalysis === 'true');
     }
-    
+
     const handleStorage = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
+      const theme = localStorage.getItem('theme');
+      setIsDark(theme === 'dark');
     };
-    
+
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
-  
+
+  const toggleDarkMode = () => {
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+    if (newIsDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+    window.dispatchEvent(new Event('storage'));
+  };
+
   const languages: { code: LanguageCode; label: string }[] = [
-    { code: 'ar', label: t.arabic },
-    { code: 'en', label: t.english },
-    { code: 'fr', label: t.french },
-    { code: 'zh', label: t.chinese },
+    { code: 'ar', label: 'العربية' },
+    { code: 'en', label: 'English' },
+    { code: 'fr', label: 'Français' },
+    { code: 'zh', label: '中文' },
   ];
 
   return (
@@ -86,6 +104,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
           </h3>
           
           <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden shadow-lg border border-black/5 dark:border-white/5">
+            {/* Notifications */}
             <div className="flex items-center justify-between p-6 border-b border-zinc-50 dark:border-white/5">
               <div className="flex items-center gap-4">
                 <Bell className="w-5 h-5 text-zinc-300 dark:text-zinc-600" />
@@ -96,31 +115,25 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
               </div>
             </div>
             
+            {/* Dark Mode with toggle button */}
             <div className="flex items-center justify-between p-6 border-b border-zinc-50 dark:border-white/5">
               <div className="flex items-center gap-4">
                 <Moon className="w-5 h-5 text-zinc-300 dark:text-zinc-600" />
                 <span className="font-bold text-black dark:text-white">{t.dark_mode}</span>
               </div>
-              <button 
-                onClick={() => {
-                  const newIsDark = !isDark;
-                  setIsDark(newIsDark);
-                  if (newIsDark) {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                  }
-                  window.dispatchEvent(new Event('storage'));
-                }}
-                className={`w-12 h-6 rounded-full relative transition-colors ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+              <button
+                onClick={toggleDarkMode}
+                className={`w-12 h-6 rounded-full relative transition-colors ${isDark ? 'bg-[#E65100]' : 'bg-zinc-300'}`}
               >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isDark ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'left-1' : 'left-1')}`} 
-                     style={{ [isRTL ? (isDark ? 'left' : 'right') : (isDark ? 'right' : 'left')]: '4px' }} />
+                <div
+                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                    isDark ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'left-1' : 'left-1')
+                  }`}
+                />
               </button>
             </div>
 
+            {/* Privacy & Security */}
             <div className="flex items-center justify-between p-6 border-b border-zinc-50 dark:border-white/5">
               <div className="flex items-center gap-4">
                 <Shield className="w-5 h-5 text-zinc-300 dark:text-zinc-600" />
@@ -128,6 +141,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
               </div>
             </div>
 
+            {/* Smart Analysis with toggle button */}
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
                 <Sparkles className="w-5 h-5 text-zinc-300 dark:text-zinc-600" />
@@ -136,17 +150,20 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
                   <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">{t.smart_analysis_desc}</span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   const newState = !isSmartAnalysisEnabled;
                   setIsSmartAnalysisEnabled(newState);
                   localStorage.setItem('smart_analysis_enabled', newState.toString());
                   window.dispatchEvent(new Event('storage'));
                 }}
-                className={`w-12 h-6 rounded-full relative transition-colors ${isSmartAnalysisEnabled ? 'bg-[#E65100]' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+                className={`w-12 h-6 rounded-full relative transition-colors ${isSmartAnalysisEnabled ? 'bg-[#E65100]' : 'bg-zinc-300'}`}
               >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSmartAnalysisEnabled ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'left-7' : 'left-1')}`}
-                     style={{ [isRTL ? (isSmartAnalysisEnabled ? 'right' : 'left') : (isSmartAnalysisEnabled ? 'right' : 'left')]: '4px' }} />
+                <div
+                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                    isSmartAnalysisEnabled ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'left-1' : 'left-1')
+                  }`}
+                />
               </button>
             </div>
           </div>
