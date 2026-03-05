@@ -1,4 +1,6 @@
-/* globals.css */
+/* app/globals.css */
+
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
