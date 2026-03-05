@@ -1,43 +1,47 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { LanguageCode, translations } from "@/lib/translations";
+import React, { createContext, useContext, useCallback, useState, ReactNode } from 'react';
 
-interface LanguageContextType {
-  language: LanguageCode;
-  setLanguage: (code: LanguageCode) => void;
-  t: typeof translations[LanguageCode];
-  isRTL: boolean;
+interface ErrorHandlerContextType {
+  onError: (error: Error | any) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const ErrorHandlerContext = createContext<ErrorHandlerContextType | undefined>(undefined);
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<LanguageCode>("ar");
+/**
+ * Hook to access the global error handler.
+ */
+export const useErrorHandler = () => {
+  const context = useContext(ErrorHandlerContext);
 
-  // تحميل اللغة من localStorage عند بداية التشغيل
-  useEffect(() => {
-    const savedLang = localStorage.getItem("language");
-    if (savedLang) setLanguage(savedLang as LanguageCode);
-  }, []);
+  // fallback state to trigger ErrorBoundary outside provider
+  const [, setError] = useState<never>();
 
-  // حفظ اللغة عند تغييرها
-  useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
+  const triggerError = useCallback((error: Error | any) => {
+    if (context) {
+      context.onError(error);
+    } else {
+      setError(() => {
+        throw error instanceof Error ? error : new Error(String(error));
+      });
+    }
+  }, [context]);
 
-  const isRTL = language === "ar";
-  const t = translations[language] || translations["ar"];
-
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return { onError: triggerError };
 };
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage must be used within LanguageProvider");
-  return context;
+interface ErrorHandlerProviderProps {
+  children: ReactNode;
+  onError: (error: Error | any) => void;
+}
+
+/**
+ * Provides a global error handler to all children.
+ */
+export const ErrorHandlerProvider: React.FC<ErrorHandlerProviderProps> = ({ children, onError }) => {
+  return (
+    <ErrorHandlerContext.Provider value={{ onError }}>
+      {children}
+    </ErrorHandlerContext.Provider>
+  );
 };
