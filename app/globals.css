@@ -1,14 +1,7 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Reset بسيط */
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-/* جسم التطبيق */
 body {
-  min-height: 100vh;
-  font-family: var(--font-arabic);
-}
+  @apply font-arabic bg-surface text-on-surface;
+}}
