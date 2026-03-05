@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ChevronLeft, Settings, Shield, Bell, Moon, Sparkles, Globe } from 'lucide-react';
-import { useLanguage } from '../lib/LanguageContext';
+import { useLanguage } from './LanguageContext';
 import { LanguageCode } from '@/lib/translations';
 
 interface SettingsScreenProps {
