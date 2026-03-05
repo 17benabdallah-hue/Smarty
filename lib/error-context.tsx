@@ -6,39 +6,24 @@ interface ErrorHandlerContextType {
   onError: (error: Error | any) => void;
 }
 
-const ErrorHandlerContext = createContext<ErrorHandlerContextType | undefined>(undefined);
+const ErrorHandlerContext = createContext<ErrorHandlerContextType | null>(null);
 
-/**
- * Hook to access the global error handler.
- */
 export const useErrorHandler = () => {
   const context = useContext(ErrorHandlerContext);
-
-  // fallback state to trigger ErrorBoundary outside provider
-  const [, setError] = useState<never>();
+  const [_, setError] = useState();
 
   const triggerError = useCallback((error: Error | any) => {
     if (context) {
       context.onError(error);
     } else {
-      setError(() => {
-        throw error instanceof Error ? error : new Error(String(error));
-      });
+      setError(() => { throw error instanceof Error ? error : new Error(String(error)); });
     }
   }, [context]);
 
   return { onError: triggerError };
 };
 
-interface ErrorHandlerProviderProps {
-  children: ReactNode;
-  onError: (error: Error | any) => void;
-}
-
-/**
- * Provides a global error handler to all children.
- */
-export const ErrorHandlerProvider: React.FC<ErrorHandlerProviderProps> = ({ children, onError }) => {
+export const ErrorHandlerProvider = ({ children, onError }: { children: ReactNode; onError: (error: Error | any) => void }) => {
   return (
     <ErrorHandlerContext.Provider value={{ onError }}>
       {children}
