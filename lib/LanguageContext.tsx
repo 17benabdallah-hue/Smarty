@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { LanguageCode, translations } from "./translations";
+import { LanguageCode, translations } from "@/lib/translations";
 
 interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (code: LanguageCode) => void;
-  t: any;
+  t: typeof translations[LanguageCode];
   isRTL: boolean;
 }
 
@@ -21,7 +21,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (savedLang) setLanguage(savedLang as LanguageCode);
   }, []);
 
-  // حفظ اللغة في localStorage عند التغيير
+  // حفظ اللغة عند تغييرها
   useEffect(() => {
     localStorage.setItem("language", language);
   }, [language]);
