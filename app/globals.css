@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
-html, body {
+/* Reset بسيط */
+* {
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+/* جسم التطبيق */
+body {
+  min-height: 100vh;
   font-family: var(--font-arabic);
 }
