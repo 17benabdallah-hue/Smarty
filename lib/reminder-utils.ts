@@ -1,3 +1,10 @@
+export interface Reminder {
+  id: string
+  text: string
+  time: string
+  completed?: boolean
+}
+
 import { translations, type LanguageCode } from './translations';
 
 export type EventType =
