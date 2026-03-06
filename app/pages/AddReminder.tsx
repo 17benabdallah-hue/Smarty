@@ -1,23 +1,32 @@
 'use client';
 
 import { useState } from "react";
+import { ReminderStorage } from "./ReminderStorage"; // استدعاء وحدة التخزين
 
 export default function AddReminder() {
-
   const [text, setText] = useState("");
 
   const handleAdd = () => {
-    if (!text) return;
+    if (!text.trim()) return;
 
-    alert("تم إضافة التذكير: " + text);
+    // إنشاء كائن تذكير جديد
+    const newReminder = {
+      id: Date.now().toString(), // معرف فريد
+      title: text,
+      date: new Date().toISOString(),
+      priority: "low", // يمكن تغييره لاحقاً حسب اختيار المستخدم
+    };
+
+    // حفظ التذكير في localStorage
+    ReminderStorage.save(newReminder);
+
+    alert("✅ تم إضافة التذكير: " + text);
 
     setText("");
   };
 
   return (
-
     <div className="bg-white p-6 rounded-2xl shadow">
-
       <h2 className="text-xl font-semibold mb-4">
         إضافة تذكير
       </h2>
@@ -36,7 +45,6 @@ export default function AddReminder() {
       >
         حفظ التذكير
       </button>
-
     </div>
   );
 }
