@@ -1,49 +1,42 @@
 'use client';
 
-import { useState } from "react";
-import { ReminderStorage } from "./ReminderStorage"; // استدعاء وحدة التخزين
+import React, { useState } from 'react';
+import { Reminder } from '@/lib/reminder-utils';
+import { ReminderStorage } from '../ReminderStorage'; // ✅ المسار الصحيح
 
 export default function AddReminder() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
 
   const handleAdd = () => {
     if (!text.trim()) return;
 
-    // إنشاء كائن تذكير جديد
-    const newReminder = {
-      id: Date.now().toString(), // معرف فريد
-      title: text,
-      date: new Date().toISOString(),
-      priority: "low", // يمكن تغييره لاحقاً حسب اختيار المستخدم
+    const newReminder: Reminder = {
+      id: Date.now().toString(),
+      text,
+      isCompleted: false,
+      reminderTimes: [],
     };
 
-    // حفظ التذكير في localStorage
-    ReminderStorage.save(newReminder);
-
-    alert("✅ تم إضافة التذكير: " + text);
-
-    setText("");
+    ReminderStorage.add(newReminder);
+    setText('');
+    alert('تمت إضافة التذكير بنجاح ✅');
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow">
-      <h2 className="text-xl font-semibold mb-4">
-        إضافة تذكير
-      </h2>
-
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">إضافة تذكير جديد</h1>
       <input
         type="text"
-        placeholder="اكتب تذكيرك هنا..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full border p-3 rounded-lg mb-4"
+        placeholder="اكتب التذكير هنا..."
+        className="border p-2 rounded w-full mb-4"
       />
-
       <button
         onClick={handleAdd}
-        className="w-full bg-green-600 text-white py-3 rounded-lg"
+        className="bg-orange-600 text-white px-4 py-2 rounded"
       >
-        حفظ التذكير
+        إضافة
       </button>
     </div>
   );
