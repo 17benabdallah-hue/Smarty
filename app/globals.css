@@ -1,10 +1,12 @@
-module.exports = {
-  darkMode: 'class', // أو 'media'
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* يمكنك إضافة ستايلات عامة هنا */
+html, body {
+  @apply h-full bg-white text-black;
+}
+
+* {
+  @apply box-border;
 }
