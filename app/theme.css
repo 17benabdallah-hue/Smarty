@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* المتغيرات المخصصة للوضع الداكن */
+/* المتغيرات المخصصة للوضع العادي */
 :root {
   --color-primary: #6750A4;
   --color-on-primary: #FFFFFF;
@@ -10,9 +10,23 @@
   --color-on-surface: #1D1B20;
 }
 
+/* المتغيرات المخصصة للوضع الداكن */
 .dark {
   --color-primary: #D0BCFF;
   --color-on-primary: #381E72;
   --color-surface: #1D1B20;
   --color-on-surface: #E6E1E5;
+}
+
+/* أمثلة لاستخدام المتغيرات مع Tailwind */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg font-semibold;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.card {
+  @apply p-6 rounded-xl shadow;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
 }
