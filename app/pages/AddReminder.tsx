@@ -13,7 +13,7 @@ export default function AddReminder() {
     const newReminder: Reminder = {
       id: Date.now().toString(),
       text,
-      Completed: false,
+      completed: false,
       reminderTimes: [],
     };
 
