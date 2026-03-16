@@ -14,7 +14,7 @@ export default function AddReminder() {
       id: Date.now().toString(),
       text,
       completed: false,
-      reminderTime: [],
+      reminderTimes: [],
     };
 
     ReminderStorage.add(newReminder);
